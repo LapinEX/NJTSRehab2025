@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康心桥 - 线上心理健康管理平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#8B5CF6',
+                        neutral: '#F3F4F6',
+                        danger: '#F43F5E',
+                        warning: '#F59E0B',
+                        info: '#06B6D4',
+                        light: '#F9FAFB',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #165DFF 0%, #8B5CF6 100%);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/95 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <i class="fa fa-heartbeat text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-primary">健康心桥</span>
+                    </a>
+                    
+                    <!-- 桌面导航 -->
+                    <nav class="hidden md:ml-10 md:flex space-x-8">
+                        <a href="#home" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-custom">首页</a>
+                        <a href="#assessment" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-custom">心理测评</a>
+                        <a href="#dashboard" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-custom">健康仪表盘</a>
+                        <a href="#knowledge" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-custom">健康知识</a>
+                        <a href="#community" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-custom">社区交流</a>
+                    </nav>
+                </div>
+                
+                <div class="flex items-center">
+                    <button id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-moon-o"></i>
+                    </button>
+                    
+                    <div class="ml-4 relative">
+                        <button id="user-menu-button" class="flex items-center text-sm font-medium text-gray-700 hover:text-primary focus:outline-none">
+                            <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/200/200?random=1" alt="用户头像">
+                            <span class="ml-2 hidden md:block">张小明</span>
+                            <i class="fa fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        
+                        <!-- 用户菜单 -->
+                        <div id="user-menu" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50">
+                            <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">个人资料</a>
+                            <a href="#records" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">健康记录</a>
+                            <a href="#settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置</a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="#logout" class="block px-4 py-2 text-sm text-danger hover:bg-gray-100">退出登录</a>
+                        </div>
+                    </div>
+                    
+                    <!-- 移动端菜单按钮 -->
+                    <button id="mobile-menu-button" class="ml-4 md:hidden p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 focus:outline-none">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="hidden md:hidden pt-2 pb-3 space-y-1">
+                <a href="#home" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">首页</a>
+                <a href="#assessment" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">心理测评</a>
+                <a href="#dashboard" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">健康仪表盘</a>
+                <a href="#knowledge" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">健康知识</a>
+                <a href="#community" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">社区交流</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="flex-grow pt-16">
+        <!-- 英雄区域 -->
+        <section id="home" class="bg-gradient-primary text-white py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-10 md:mb-0">
+                        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow mb-6">
+                            用心呵护，<br>健康生活每一天
+                        </h1>
+                        <p class="text-xl opacity-90 mb-8 max-w-xl">
+                            健康心桥为您提供专业的心理健康评估和管理服务，帮助您了解自己的心理状态，管理健康生活。
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#assessment" class="bg-white text-primary px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-custom transform hover:-translate-y-1">
+                                开始测评
+                            </a>
+                            <a href="#dashboard" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-custom">
+                                查看健康报告
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 relative">
+                        <img src="https://picsum.photos/600/400?random=2" alt="心理健康服务" class="rounded-lg shadow-2xl transform rotate-2 hover:rotate-0 transition-custom duration-500 w-full max-w-lg mx-auto">
+                        <div class="absolute -bottom-5 -left-5 bg-white text-primary p-4 rounded-lg shadow-lg transform -rotate-3 hover:rotate-0 transition-custom">
+                            <p class="font-bold">98%</p>
+                            <p class="text-sm">用户满意度</p>
+                        </div>
+                        <div class="absolute -top-5 -right-5 bg-white text-accent p-4 rounded-lg shadow-lg transform rotate-3 hover:rotate-0 transition-custom">
+                            <p class="font-bold">24/7</p>
+                            <p class="text-sm">专业支持</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 心理健康三问卡片 -->
+        <section class="py-16 bg-light">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">心理健康三问</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">每天花一分钟，关注自己的心理健康状态，及时发现情绪变化</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 今日心情 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom p-6 border-t-4 border-primary">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-semibold text-lg text-gray-800">今日心情</h3>
+                            <span class="text-primary"><i class="fa fa-smile-o text-xl"></i></span>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-gray-600">今天你的心情如何？这将帮助我们了解你的情绪变化趋势。</p>
+                            <div class="flex justify-between">
+                                <button class="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition-custom">
+                                    <i class="fa fa-frown-o"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center hover:bg-yellow-200 transition-custom">
+                                    <i class="fa fa-meh-o"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-full bg-green-100 text-green-500 flex items-center justify-center hover:bg-green-200 transition-custom">
+                                    <i class="fa fa-smile-o"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center hover:bg-blue-200 transition-custom">
+                                    <i class="fa fa-grin-alt"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center hover:bg-purple-200 transition-custom">
+                                    <i class="fa fa-grin-stars"></i>
+                                </button>
+                            </div>
+                            <button class="w-full bg-primary/10 text-primary rounded-lg py-2 hover:bg-primary/20 transition-custom">
+                                记录今日心情
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 压力水平 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom p-6 border-t-4 border-accent">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-semibold text-lg text-gray-800">压力水平</h3>
+                            <span class="text-accent"><i class="fa fa-tachometer text-xl"></i></span>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-gray-600">评估一下你当前的压力水平，帮助我们更好地了解你的状态。</p>
+                            <div class="relative pt-1">
+                                <div class="flex mb-2 items-center justify-between">
+                                    <div>
+                                        <span class="text-xs font-semibold inline-block text-gray-600">低</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xs font-semibold inline-block text-gray-600">高</span>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                                    <div style="width:35%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-accent transition-all duration-500"></div>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="px-3 py-1 text-xs rounded-full bg-gray-100 hover:bg-gray-200 transition-custom">1</button>
+                                    <button class="px-3 py-1 text-xs rounded-full bg-gray-100 hover:bg-gray-200 transition-custom">2</button>
+                                    <button class="px-3 py-1 text-xs rounded-full bg-gray-100 hover:bg-gray-200 transition-custom">3</button>
+                                    <button class="px-3 py-1 text-xs rounded-full bg-accent/20 text-accent">4</button>
+                                    <button class="px-3 py-1 text-xs rounded-full bg-gray-100 hover:bg-gray-200 transition-custom">5</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-accent/10 text-accent rounded-lg py-2 hover:bg-accent/20 transition-custom">
+                                更新压力水平
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 睡眠质量 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom p-6 border-t-4 border-info">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-semibold text-lg text-gray-800">睡眠质量</h3>
+                            <span class="text-info"><i class="fa fa-moon-o text-xl"></i></span>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-gray-600">良好的睡眠是心理健康的基础，记录你的睡眠状况。</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="p-2 border border-gray-200 rounded-lg hover:border-info hover:bg-info/5 transition-custom">
+                                    <div class="text-center">
+                                        <i class="fa fa-bed text-xl text-gray-400"></i>
+                                        <p class="text-xs mt-1">6小时</p>
+                                    </div>
+                                </button>
+                                <button class="p-2 border border-info bg-info/5 rounded-lg">
+                                    <div class="text-center">
+                                        <i class="fa fa-bed text-xl text-info"></i>
+                                        <p class="text-xs mt-1">7小时</p>
+                                    </div>
+                                </button>
+                                <button class="p-2 border border-gray-200 rounded-lg hover:border-info hover:bg-info/5 transition-custom">
+                                    <div class="text-center">
+                                        <i class="fa fa-bed text-xl text-gray-400"></i>
+                                        <p class="text-xs mt-1">8小时</p>
+                                    </div>
+                                </button>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-600 block mb-1">睡眠质量</label>
+                                <select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-info/50">
+                                    <option>非常好</option>
+                                    <option selected>良好</option>
+                                    <option>一般</option>
+                                    <option>较差</option>
+                                    <option>很差</option>
+                                </select>
+                            </div>
+                            <button class="w-full bg-info/10 text-info rounded-lg py-2 hover:bg-info/20 transition-custom">
+                                记录睡眠情况
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 评估测试区域 -->
+        <section id="assessment" class="py-16 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">专业心理测评</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">基于科学心理学量表，帮助你了解自己的心理健康状况</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 焦虑自评量表 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=3" alt="焦虑自评量表" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">焦虑评估</span>
+                                <span class="text-sm text-gray-500">10-15分钟</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">焦虑自评量表 (SAS)</h3>
+                            <p class="text-gray-600 text-sm mb-4">评估焦虑症状的严重程度，帮助识别焦虑相关问题。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://picsum.photos/100/100?random=4" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=5" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=6" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">1,245人已测试</span>
+                                </div>
+                                <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+                                    开始测试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 抑郁自评量表 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=7" alt="抑郁自评量表" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-danger/10 text-danger text-xs rounded-full">抑郁评估</span>
+                                <span class="text-sm text-gray-500">15-20分钟</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">抑郁自评量表 (SDS)</h3>
+                            <p class="text-gray-600 text-sm mb-4">评估抑郁症状的严重程度，筛查可能的抑郁倾向。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://picsum.photos/100/100?random=8" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=9" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=10" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">2,138人已测试</span>
+                                </div>
+                                <button class="px-4 py-2 bg-danger text-white rounded-lg hover:bg-danger/90 transition-custom">
+                                    开始测试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 压力评估量表 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=11" alt="压力评估量表" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-warning/10 text-warning text-xs rounded-full">压力评估</span>
+                                <span class="text-sm text-gray-500">8-12分钟</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">压力评估量表 (PSS)</h3>
+                            <p class="text-gray-600 text-sm mb-4">评估生活中的压力水平和应对能力，了解压力来源。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://picsum.photos/100/100?random=12" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=13" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                        <img src="https://picsum.photos/100/100?random=14" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-500">967人已测试</span>
+                                </div>
+                                <button class="px-4 py-2 bg-warning text-white rounded-lg hover:bg-warning/90 transition-custom">
+                                    开始测试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <a href="#" class="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-custom">
+                        查看更多测评量表
+                        <i class="fa fa-long-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 健康仪表盘 -->
+        <section id="dashboard" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">健康仪表盘</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">直观了解您的心理健康状况和变化趋势</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">心情晴雨统计</h3>
+                        <div class="flex items-center mt-4 md:mt-0">
+                            <div class="relative">
+                                <select class="appearance-none bg-gray-100 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-primary">
+                                    <option>最近30天</option>
+                                    <option>最近90天</option>
+                                    <option>今年</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                            <button class="ml-3 bg-primary/10 text-primary px-4 py-2 rounded-lg hover:bg-primary/20 transition-custom">
+                                <i class="fa fa-download mr-1"></i> 导出报告
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow-sm p-4">
+                                <canvas id="moodChart" height="250"></canvas>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-800 mb-3">情绪分布</h4>
+                                <canvas id="moodDistribution" height="180"></canvas>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-800 mb-3">压力水平</h4>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">当前压力指数</span>
+                                    <span class="font-bold text-accent">3.2/5</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-accent h-2 rounded-full" style="width: 64%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>低</span>
+                                    <span>中</span>
+                                    <span>高</span>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-gray-600">睡眠质量</span>
+                                        <span class="font-bold text-info">良好</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-info h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>差</span>
+                                        <span>一般</span>
+                                        <span>良好</span>
+                                        <span>优秀</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">最近测评结果</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-custom cursor-pointer">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">焦虑自评量表 (SAS)</h4>
+                                        <p class="text-sm text-gray-500">完成于 2025年6月15日</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-lg font-bold text-primary">42分</span>
+                                        <span class="text-xs text-gray-500">轻度焦虑倾向</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 42%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>正常</span>
+                                        <span>轻度</span>
+                                        <span>中度</span>
+                                        <span>重度</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-custom cursor-pointer">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">抑郁自评量表 (SDS)</h4>
+                                        <p class="text-sm text-gray-500">完成于 2025年6月8日</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-lg font-bold text-danger">38分</span>
+                                        <span class="text-xs text-gray-500">正常范围</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-danger h-2 rounded-full" style="width: 38%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>正常</span>
+                                        <span>轻度</span>
+                                        <span>中度</span>
+                                        <span>重度</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-custom cursor-pointer">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">压力评估量表 (PSS)</h4>
+                                        <p class="text-sm text-gray-500">完成于 2025年6月1日</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-lg font-bold text-warning">56分</span>
+                                        <span class="text-xs text-gray-500">中度压力</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-warning h-2 rounded-full" style="width: 56%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>低</span>
+                                        <span>中</span>
+                                        <span>高</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-6">
+                            <a href="#" class="text-primary font-medium hover:text-primary/80 transition-custom">
+                                查看所有测评记录
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">健康建议</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fa fa-lightbulb-o text-primary text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">针对您的焦虑倾向</h4>
+                                        <div class="mt-2 text-sm text-gray-600">
+                                            <p>根据您最近的测评结果，建议您尝试每天进行10-15分钟的冥想练习，可以有效缓解焦虑情绪。</p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a href="#" class="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80">
+                                                查看冥想指南
+                                                <i class="fa fa-arrow-right ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-warning/5 rounded-lg border-l-4 border-warning">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fa fa-heartbeat text-warning text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">压力管理建议</h4>
+                                        <div class="mt-2 text-sm text-gray-600">
+                                            <p>您的压力水平处于中等偏高，建议您调整工作和生活节奏，适当增加户外活动时间，保持良好的社交关系。</p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a href="#" class="inline-flex items-center text-sm font-medium text-warning hover:text-warning/80">
+                                                学习压力管理技巧
+                                                <i class="fa fa-arrow-right ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-info/5 rounded-lg border-l-4 border-info">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fa fa-calendar-check-o text-info text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h4 class="text-sm font-medium text-gray-800">随访提醒</h4>
+                                        <div class="mt-2 text-sm text-gray-600">
+                                            <p>您的心理咨询师将于3天后（6月21日）进行随访，请准备好您的近期心理状态记录。</p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a href="#" class="inline-flex items-center text-sm font-medium text-info hover:text-info/80">
+                                                查看随访详情
+                                                <i class="fa fa-arrow-right ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">下一步建议</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox text-primary h-5 w-5 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-600">完成每日心理健康三问</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox text-primary h-5 w-5 rounded">
+                                    <span class="ml-2 text-sm text-gray-600">参加下周的减压工作坊</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox text-primary h-5 w-5 rounded">
+                                    <span class="ml-2 text-sm text-gray-600">预约心理咨询师</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox text-primary h-5 w-5 rounded">
+                                    <span class="ml-2 text-sm text-gray-600">阅读《焦虑症的自我调节》</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 健康知识区域 -->
+        <section id="knowledge" class="py-16 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">健康知识百科</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">了解更多心理健康知识，掌握自我调节方法</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 文章卡片 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=15" alt="焦虑症的自我调节" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">焦虑管理</span>
+                                <span class="text-sm text-gray-500">5分钟阅读</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">焦虑症的自我调节：实用技巧与策略</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">了解如何通过呼吸练习、认知重构和行为疗法等方法，有效管理和减轻焦虑症状。</p>
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=16" alt="作者头像" class="w-8 h-8 rounded-full">
+                                    <span class="ml-2 text-sm text-gray-600">李明博士</span>
+                                </div>
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                    阅读更多 <i class="fa fa-angle-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章卡片 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=17" alt="睡眠与心理健康" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-info/10 text-info text-xs rounded-full">睡眠健康</span>
+                                <span class="text-sm text-gray-500">7分钟阅读</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">睡眠与心理健康：如何建立良好的睡眠习惯</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">探讨睡眠质量与心理健康的关系，以及如何通过调整生活习惯改善睡眠问题。</p>
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=18" alt="作者头像" class="w-8 h-8 rounded-full">
+                                    <span class="ml-2 text-sm text-gray-600">张雯教授</span>
+                                </div>
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                    阅读更多 <i class="fa fa-angle-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章卡片 -->
+                    <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                        <div class="h-48 overflow-hidden">
+                            <img src="https://picsum.photos/600/400?random=19" alt="压力管理" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="px-3 py-1 bg-warning/10 text-warning text-xs rounded-full">压力管理</span>
+                                <span class="text-sm text-gray-500">6分钟阅读</span>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">职场压力管理：如何在高压环境中保持心理健康</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">针对现代职场人士，提供实用的压力管理技巧和心理调节方法，帮助你在工作中保持平衡。</p>
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=20" alt="作者头像" class="w-8 h-8 rounded-full">
+                                    <span class="ml-2 text-sm text-gray-600">王健心理师</span>
+                                </div>
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                    阅读更多 <i class="fa fa-angle-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 视频推荐 -->
+                <div class="mt-16">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-xl font-bold text-gray-800">推荐视频</h3>
+                        <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                            查看更多 <i class="fa fa-angle-right ml-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                            <div class="relative">
+                                <img src="https://picsum.photos/600/338?random=21" alt="冥想视频封面" class="w-full h-40 object-cover">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                                        <i class="fa fa-play text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                    12:35
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-semibold text-gray-800">每日10分钟冥想练习：缓解焦虑与压力</h4>
+                                <p class="text-sm text-gray-500 mt-1">心理健康中心</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                            <div class="relative">
+                                <img src="https://picsum.photos/600/338?random=22" alt="认知行为疗法视频封面" class="w-full h-40 object-cover">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                                        <i class="fa fa-play text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                    18:42
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-semibold text-gray-800">认知行为疗法入门：改变负面思维模式</h4>
+                                <p class="text-sm text-gray-500 mt-1">心理学讲堂</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-custom overflow-hidden group">
+                            <div class="relative">
+                                <img src="https://picsum.photos/600/338?random=23" alt="情绪管理视频封面" class="w-full h-40 object-cover">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                                        <i class="fa fa-play text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                    15:10
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="font-semibold text-gray-800">情绪管理技巧：如何应对愤怒与挫败感</h4>
+                                <p class="text-sm text-gray-500 mt-1">心灵成长学院</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 社区交流区域 -->
+        <section id="community" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">社区交流</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">与有相似经历的人分享经验，互相支持</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- 患友经验分享 -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold text-gray-800">患友治疗经验</h3>
+                                <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-custom">
+                                    <i class="fa fa-plus mr-1"></i> 分享经验
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <!-- 经验分享卡片 -->
+                                <div class="border-b border-gray-100 pb-6">
+                                    <div class="flex items-start">
+                                        <img src="https://picsum.photos/100/100?random=24" alt="用户头像" class="w-10 h-10 rounded-full mr-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-semibold text-gray-800">我是如何克服社交焦虑的</h4>
+                                                <span class="text-xs text-gray-500">2天前</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm mt-2">
+                                                曾经我是一个极度社恐的人，不敢与人交流，甚至害怕出门。通过认知行为疗法和药物治疗，我逐渐克服了这些问题。现在我想分享我的经验，希望能帮助到有类似困扰的人...
+                                            </p>
+                                            <div class="flex items-center mt-3">
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-thumbs-up mr-1"></i> 32
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-comment-o mr-1"></i> 12
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom">
+                                                    <i class="fa fa-share-alt mr-1"></i> 分享
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 经验分享卡片 -->
+                                <div class="border-b border-gray-100 pb-6">
+                                    <div class="flex items-start">
+                                        <img src="https://picsum.photos/100/100?random=25" alt="用户头像" class="w-10 h-10 rounded-full mr-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-semibold text-gray-800">抑郁症康复后，我的生活发生了这些变化</h4>
+                                                <span class="text-xs text-gray-500">1周前</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm mt-2">
+                                                经过两年的治疗和自我调整，我终于走出了抑郁症的阴影。这段经历让我重新审视了自己的生活，也让我学会了如何更好地照顾自己的心理健康...
+                                            </p>
+                                            <div class="flex items-center mt-3">
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-thumbs-up mr-1"></i> 45
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-comment-o mr-1"></i> 23
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom">
+                                                    <i class="fa fa-share-alt mr-1"></i> 分享
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 经验分享卡片 -->
+                                <div>
+                                    <div class="flex items-start">
+                                        <img src="https://picsum.photos/100/100?random=26" alt="用户头像" class="w-10 h-10 rounded-full mr-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-semibold text-gray-800">冥想和正念如何帮助我管理焦虑</h4>
+                                                <span class="text-xs text-gray-500">2周前</span>
+                                            </div>
+                                            <p class="text-gray-600 text-sm mt-2">
+                                                作为一名长期焦虑症患者，我尝试过各种治疗方法。最终发现，冥想和正念练习对我帮助最大。在这里我想分享我的日常练习方法和心得体会...
+                                            </p>
+                                            <div class="flex items-center mt-3">
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-thumbs-up mr-1"></i> 28
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom mr-4">
+                                                    <i class="fa fa-comment-o mr-1"></i> 15
+                                                </button>
+                                                <button class="text-gray-500 hover:text-primary transition-custom">
+                                                    <i class="fa fa-share-alt mr-1"></i> 分享
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-8">
+                                <button class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-custom">
+                                    加载更多
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 随访干预与专家咨询 -->
+                    <div>
+                        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">随访干预</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-primary/5 rounded-lg p-4 border-l-4 border-primary">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">心理咨询师随访</h4>
+                                            <p class="text-sm text-gray-600 mt-1">您的心理咨询师将于3天后（6月21日）进行随访</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">即将到来</span>
+                                    </div>
+                                    <div class="mt-3 flex justify-between">
+                                        <button class="text-sm bg-primary/10 text-primary px-3 py-1 rounded hover:bg-primary/20 transition-custom">
+                                            查看详情
+                                        </button>
+                                        <button class="text-sm bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-custom">
+                                            确认
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">药物治疗评估</h4>
+                                            <p class="text-sm text-gray-600 mt-1">您的精神科医生将于2周后进行药物治疗评估</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">计划中</span>
+                                    </div>
+                                    <div class="mt-3 flex justify-between">
+                                        <button class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-custom">
+                                            查看详情
+                                        </button>
+                                        <button class="text-sm bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-custom">
+                                            预约
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">团体心理治疗</h4>
+                                            <p class="text-sm text-gray-600 mt-1">下一次团体治疗将于6月25日（周三）19:00开始</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-full">计划中</span>
+                                    </div>
+                                    <div class="mt-3 flex justify-between">
+                                        <button class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-custom">
+                                            查看详情
+                                        </button>
+                                        <button class="text-sm bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-custom">
+                                            参加
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <a href="#" class="text-primary font-medium hover:text-primary/80 transition-custom">
+                                    查看所有随访记录
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 专家咨询 -->
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">专家咨询</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=27" alt="专家头像" class="w-12 h-12 rounded-full mr-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-800">陈医生</h4>
+                                        <p class="text-sm text-gray-500">精神科主任医师</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex">
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-2">4.8 (124评价)</span>
+                                        </div>
+                                    </div>
+                                    <button class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary/90 transition-custom">
+                                        预约
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=28" alt="专家头像" class="w-12 h-12 rounded-full mr-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-800">李医生</h4>
+                                        <p class="text-sm text-gray-500">心理咨询师</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex">
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star-o text-yellow-400"></i>
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-2">4.0 (87评价)</span>
+                                        </div>
+                                    </div>
+                                    <button class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary/90 transition-custom">
+                                        预约
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/100/100?random=29" alt="专家头像" class="w-12 h-12 rounded-full mr-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-800">王医生</h4>
+                                        <p class="text-sm text-gray-500">心理治疗师</p>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex">
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                                <i class="fa fa-star text-yellow-400"></i>
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-2">5.0 (63评价)</span>
+                                        </div>
+                                    </div>
+                                    <button class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary/90 transition-custom">
+                                        预约
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <a href="#" class="text-primary font-medium hover:text-primary/80 transition-custom">
+                                    查看全部专家
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fa fa-heartbeat text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">健康心桥</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        健康心桥致力于为用户提供专业、便捷的心理健康服务，帮助您更好地了解和管理自己的心理健康。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-custom">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-custom">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-custom">
+                            <i class="fa fa-qq"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">服务项目</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">心理测评</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">心理咨询</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">心理治疗</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">健康管理</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">专家讲座</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">关于我们</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">平台介绍</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">专家团队</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">合作机构</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">新闻动态</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-custom">加入我们</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">联系方式</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fa fa-map-marker text-primary mr-2"></i>
+                            <span class="text-gray-400">北京市海淀区中关村南大街5号</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone text-primary mr-2"></i>
+                            <span class="text-gray-400">400-123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope text-primary mr-2"></i>
+                            <span class="text-gray-400">contact@healthbridge.com</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4">
+                        
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-custom">
+                            <i class="fa fa-headphones mr-1"></i> 在线咨询
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2025 健康心桥 版权所有 | 京ICP备12345678号-1</p>
+                <p class="mt-2">本平台内容仅供参考，不能作为诊断及医疗依据，就医请遵照医生诊断</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.remove('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-md');
+                navbar.classList.add('shadow-sm');
+            }
+        });
+        
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 用户菜单切换
+        document.getElementById('user-menu-button').addEventListener('click', function() {
+            const userMenu = document.getElementById('user-menu');
+            userMenu.classList.toggle('hidden');
+        });
+        
+        // 主题切换
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-moon-o')) {
+                icon.classList.remove('fa-moon-o');
+                icon.classList.add('fa-sun-o');
+                document.body.classList.add('dark-theme');
+            } else {
+                icon.classList.remove('fa-sun-o');
+                icon.classList.add('fa-moon-o');
+                document.body.classList.remove('dark-theme');
+            }
+        });
+        
+        // 心情图表
+        const moodCtx = document.getElementById('moodChart').getContext('2d');
+        const moodChart = new Chart(moodCtx, {
+            type: 'line',
+            data: {
+                labels: ['6/1', '6/2', '6/3', '6/4', '6/5', '6/6', '6/7', '6/8', '6/9', '6/10', '6/11', '6/12', '6/13', '6/14', '6/15'],
+                datasets: [{
+                    label: '心情指数',
+                    data: [65, 59, 80, 81, 56, 55, 72, 68, 75, 70, 65, 62, 68, 72, 67],
+                    borderColor: '#165DFF',
+                    backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 心情分布图表
+        const distributionCtx = document.getElementById('moodDistribution').getContext('2d');
+        const distributionChart = new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['非常好', '良好', '一般', '较差', '很差'],
+                datasets: [{
+                    data: [15, 60, 20, 3, 2],
+                    backgroundColor: [
+                        '#36D399',
+                        '#165DFF',
+                        '#F59E0B',
+                        '#F43F5E',
+                        '#9CA3AF'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // 关闭移动端菜单
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
+    
