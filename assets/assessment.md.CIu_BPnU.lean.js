@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as s,ae as l}from"./chunks/framework.Dgg8-8ov.js";const m=JSON.parse('{"title":"心理评估","description":"","frontmatter":{},"headers":[],"relativePath":"assessment.md","filePath":"assessment.md"}'),i={name:"assessment.md"};function r(o,a,n,_,d,c){return s(),t("div",null,a[0]||(a[0]=[l("",5)]))}const u=e(i,[["render",r]]);export{m as __pageData,u as default};

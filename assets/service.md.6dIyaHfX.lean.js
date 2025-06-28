@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as r,ae as o}from"./chunks/framework.Dgg8-8ov.js";const p=JSON.parse('{"title":"核心服务","description":"","frontmatter":{},"headers":[],"relativePath":"service.md","filePath":"service.md"}'),i={name:"service.md"};function s(n,a,c,l,d,h){return r(),t("div",null,a[0]||(a[0]=[o("",7)]))}const m=e(i,[["render",s]]);export{p as __pageData,m as default};

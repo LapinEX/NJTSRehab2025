@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as l,ae as r}from"./chunks/framework.Dgg8-8ov.js";const m=JSON.parse('{"title":"馨络智康","description":"","frontmatter":{},"headers":[],"relativePath":"README.md","filePath":"README.md"}'),i={name:"README.md"};function o(s,a,_,n,c,h){return l(),t("div",null,a[0]||(a[0]=[r("",4)]))}const p=e(i,[["render",o]]);export{m as __pageData,p as default};
